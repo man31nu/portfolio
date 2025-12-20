@@ -62,7 +62,7 @@ A clean, responsive personal portfolio showcasing my projects, technical skills,
 ## 🚀 Projects
 
 Each project includes:
-- 🔗 Live Demo
+- 🔗 Live Demo : https://portfolio-man31nu.vercel.app/
 - 💻 GitHub Repository
 
 Accessible from the **Projects** section on the website.
@@ -72,4 +72,5 @@ Accessible from the **Projects** section on the website.
 ## 📄 Resume
 
 Download directly from the site:
+
 
