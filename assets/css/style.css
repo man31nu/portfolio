@@ -1654,3 +1654,45 @@ body {
   width: auto;
   display: block;
 }
+
+
+/* =================================================
+   FINAL MOBILE HOME FIX (DO NOT MODIFY)
+   ================================================= */
+
+/* Fix broken height calculation */
+.home__container {
+  min-height: 100vh;
+}
+
+/* Mobile layout correction */
+@media (max-width: 767px) {
+
+  /* Stack hero content properly */
+  .home__container {
+    grid-template-columns: 1fr;
+    align-content: start;
+    padding-top: 4rem;
+  }
+
+  /* Prevent image overlap */
+  .home__img {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .home__img img {
+    width: 220px;
+    max-height: 300px;
+  }
+
+  /* Prevent social icons pushing layout */
+  .home__social {
+    margin-top: 2rem;
+    flex-direction: row;
+  }
+}
