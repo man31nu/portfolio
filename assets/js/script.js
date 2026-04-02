@@ -1,6 +1,19 @@
-// ===============================
-// TOGGLE NAVBAR
-// ===============================
+/* ==========================================================================
+   SCROLL REVEAL ANIMATION
+   ========================================================================== */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('active');
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+/* ===============================
+   TOGGLE NAVBAR
+   =============================== */
 const showMenu = (toggleId, navId) => {
   const toggle = document.getElementById(toggleId);
   const nav = document.getElementById(navId);
@@ -14,9 +27,9 @@ const showMenu = (toggleId, navId) => {
 
 showMenu("nav-toggle", "nav-menu");
 
-// ===============================
-// REMOVE MENU ON LINK CLICK
-// ===============================
+/* ===============================
+   REMOVE MENU ON LINK CLICK
+   =============================== */
 const navLink = document.querySelectorAll(".nav__link");
 
 function linkAction() {
@@ -26,22 +39,31 @@ function linkAction() {
 
 navLink.forEach((n) => n.addEventListener("click", linkAction));
 
-// ===============================
-// SCROLL ACTIVE LINK
-// ===============================
+/* ===============================
+   SCROLL ACTIVE LINK & HEADER BACKGROUND
+   =============================== */
 const sections = document.querySelectorAll("section[id]");
+const header = document.getElementById("header");
 
-function scrollActive() {
+function scrollHandler() {
   const scrollY = window.pageYOffset;
 
+  // Header background toggle
+  if (header) {
+    if (scrollY >= 50) {
+      header.classList.add("scroll-header");
+    } else {
+      header.classList.remove("scroll-header");
+    }
+  }
+
+  // Active link highlighing
   sections.forEach((current) => {
     const sectionHeight = current.offsetHeight;
-    const sectionTop = current.offsetTop - 30;
+    const sectionTop = current.offsetTop - 100;
     const sectionId = current.getAttribute("id");
 
-    const link = document.querySelector(
-      ".nav__menu a[href*=" + sectionId + "]"
-    );
+    const link = document.querySelector(".nav__menu a[href*=" + sectionId + "]");
 
     if (!link) return;
 
@@ -53,46 +75,11 @@ function scrollActive() {
   });
 }
 
-window.addEventListener("scroll", scrollActive);
+window.addEventListener("scroll", scrollHandler);
 
-// ===============================
-// CHANGE HEADER BACKGROUND ON SCROLL
-// ===============================
-function scrollHeader() {
-  const header = document.getElementById("header");
-  if (!header) return;
-
-  if (window.scrollY >= 550) {
-    header.classList.add("scroll-header");
-  } else {
-    header.classList.remove("scroll-header");
-  }
-}
-
-window.addEventListener("scroll", scrollHeader);
-
-// ===============================
-// SWIPER JS
-// ===============================
-if (typeof Swiper !== "undefined") {
-  new Swiper(".swiper", {
-    slidesPerView: 1,
-    spaceBetween: 16,
-    grabCursor: true,
-    pagination: {
-      el: ".swiper-pagination",
-      clickable: true,
-    },
-    breakpoints: {
-      640: { slidesPerView: 2 },
-      1024: { slidesPerView: 3 },
-    },
-  });
-}
-
-// ===============================
-// PROJECT FILTER FUNCTIONALITY
-// ===============================
+/* ===============================
+   PROJECT FILTER FUNCTIONALITY
+   =============================== */
 document.addEventListener("DOMContentLoaded", () => {
   const filterButtons = document.querySelectorAll(".filter-btn");
   const projectCards = document.querySelectorAll(".project-card");
@@ -101,7 +88,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   filterButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      // Active button state
       filterButtons.forEach((btn) => btn.classList.remove("active"));
       button.classList.add("active");
 
@@ -109,9 +95,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       projectCards.forEach((card) => {
         const category = card.dataset.category;
-
-        if (category === filterValue) {
+        if (filterValue === category || filterValue === "all") {
           card.style.display = "block";
+          card.classList.add('reveal', 'active'); // Re-trigger reveal animation
         } else {
           card.style.display = "none";
         }
@@ -120,43 +106,61 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// ===============================
-// CONTACT FORM – EMAILJS
-// ===============================
-(function () {
-  if (typeof emailjs !== "undefined") {
-    emailjs.init("YOUR_PUBLIC_KEY"); // 🔴 replace with real key
-  }
-})();
-
+/* ===============================
+   CONTACT FORM – EMAILJS
+   =============================== */
 const contactForm = document.getElementById("contact-form");
 const formStatus = document.getElementById("form-status");
+
+// Initialize EmailJS
+(function () {
+  if (typeof emailjs !== "undefined") {
+    // 🔴 REPLACE with your actual Public Key from EmailJS dashboard
+    emailjs.init("YOUR_PUBLIC_KEY");
+  }
+})();
 
 if (contactForm) {
   contactForm.addEventListener("submit", function (e) {
     e.preventDefault();
 
-    emailjs
-      .sendForm(
-        "YOUR_SERVICE_ID",   // 🔴 replace
-        "YOUR_TEMPLATE_ID",  // 🔴 replace
+    // Show sending status
+    if (formStatus) {
+      formStatus.textContent = "Sending...";
+      formStatus.style.color = "var(--accent-light)";
+    }
+
+    if (typeof emailjs !== "undefined") {
+      emailjs.sendForm(
+        "YOUR_SERVICE_ID",   // 🔴 REPLACE with your actual Service ID
+        "YOUR_TEMPLATE_ID",  // 🔴 REPLACE with your actual Template ID
         this
       )
       .then(
         () => {
           if (formStatus) {
-            formStatus.textContent = "✅ Message sent successfully!";
-            formStatus.style.color = "#38bdf8";
+            formStatus.textContent = "Message sent successfully! ✨";
+            formStatus.style.color = "#4ade80"; // Bright Green
           }
           contactForm.reset();
+          setTimeout(() => { if(formStatus) formStatus.textContent = ""; }, 5000);
         },
         () => {
           if (formStatus) {
-            formStatus.textContent =
-              "❌ Failed to send message. Try again.";
-            formStatus.style.color = "#ef4444";
+            formStatus.textContent = "Failed to send message. Please try again.";
+            formStatus.style.color = "#f87171"; // Bright Red
           }
         }
       );
+    } else {
+      // Simulation if EmailJS is not loaded or for local testing
+      setTimeout(() => {
+         if (formStatus) {
+           formStatus.textContent = "Simulation: Message sent! (EmailJS not linked)";
+           formStatus.style.color = "var(--accent-light)";
+         }
+         contactForm.reset();
+      }, 1000);
+    }
   });
 }
